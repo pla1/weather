@@ -22,5 +22,5 @@ do
 done
 
 javac -encoding UTF-8 -cp .:* src/main/java/com/plawx/*.java
-java -cp src/main/java:.:* com.plawx.Main
+java -cp src/main/java:.:* com.plawx.WeatherDAO writeCurrentConditions
 
