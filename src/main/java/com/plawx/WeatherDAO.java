@@ -16,12 +16,18 @@ public class WeatherDAO {
             dao.writeCurrentConditions();
             System.exit(0);
         }
-        if (false) {
-            String message = dao.getHistoryMessage();
-            System.out.format("%s\n", message);
+        if (args.length == 1 && args[0].equals("historyMessage") || true) {
+            CityDAO cityDAO = new CityDAO();
+            ArrayList<City> cities = cityDAO.get();
+            StringBuilder sb = new StringBuilder();
+            for (City city:cities) {
+                String message = dao.getHistoryMessage(city);
+                sb.append(message).append("\n");
+            }
+            System.out.println(sb);
             System.exit(0);
         }
-        if (true) {
+        if (false) {
             dao.writeCurrentConditions();
             System.exit(0);
         }
@@ -152,7 +158,7 @@ public class WeatherDAO {
         }
     }
 
-    public String getHistoryMessage() {
+    public String getHistoryMessage(City city) {
         Connection connection = null;
         PreparedStatement ps = null;
         Statement statement = null;
@@ -168,28 +174,33 @@ public class WeatherDAO {
                     "from weather " +
                     "where extract(month from date_timestamp) = extract(month from current_date) " +
                     "and extract(day from date_timestamp) = extract(day from current_date) " +
-                    "order by temperature " +
+                    "and city_name = '" +
+                    city.getCityName() +
+                    "' order by temperature " +
                     "fetch first 1 row only");
 
             if (rs.next()) {
                 temperatureLow = rs.getDouble("temperature");
                 timestampLow = rs.getTimestamp("date_timestamp");
-
             }
             rs = statement.executeQuery("select date_timestamp, temperature " +
                     "from weather " +
                     "where extract(month from date_timestamp) = extract(month from current_date) " +
                     "and extract(day from date_timestamp) = extract(day from current_date) " +
-                    "order by temperature desc " +
+                    "and city_name = '" +
+                    city.getCityName() +
+                    "' order by temperature desc " +
                     "fetch first 1 row only");
 
             if (rs.next()) {
                 temperatureHigh = rs.getDouble("temperature");
                 timestampHigh = rs.getTimestamp("date_timestamp");
             }
+            SimpleDateFormat monthDayYearFormat = new SimpleDateFormat("MMM dd, yyyy");
+            SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy");
             if (temperatureHigh != 0 && temperatureLow != 0) {
-                return String.format("On %s the low was %.2f. On %s the high was %.2f.",
-                        Utils.getFullDate(timestampLow), temperatureLow, Utils.getFullDate(timestampHigh), temperatureHigh);
+                return String.format("On %s the low was %.0f℉ and in %s the high was %.0f℉. %s SC",
+                        monthDayYearFormat.format(timestampLow), temperatureLow, yearFormat.format(timestampHigh), temperatureHigh, city.getCityName());
             }
         } catch (Exception e) {
             e.printStackTrace();

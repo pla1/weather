@@ -40,7 +40,6 @@ public class Utils {
         Properties properties = Utils.getProperties();
         String url = String.format("jdbc:postgresql://%s/%s?user=%s&password=%s",
                 properties.get("dbHost"), properties.get("dbName"), properties.get("dbUser"), properties.get("dbPassword"));
-        System.out.println(url);
         try {
             Class.forName("org.postgresql.Driver");
             return DriverManager.getConnection(url, "postgres", "Hahvai8rohbeethaefung0aeroGh6s");
@@ -212,7 +211,6 @@ public class Utils {
         }
     }
     public static JsonObject get(String urlString) {
-        System.out.format("get URL: %s.\n", urlString);
         HttpsURLConnection urlConnection;
         InputStream inputStream = null;
         OutputStream outputStream = null;
